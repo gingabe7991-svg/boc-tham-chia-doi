@@ -1,209 +1,520 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bốc thăm chia đội KLB FC (theo cặp)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bốc thăm & Sơ đồ 7 người (theo cặp + vị trí)</title>
   <style>
-    :root { --radius: 14px; }
+    :root { --r: 14px; }
     * { box-sizing: border-box; }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      margin: 0; padding: 24px;
-      background: #0f172a; /* slate-900 */
-      color: #e2e8f0;      /* slate-200 */
-    }
-    .container {
-      max-width: 1100px; margin: 0 auto;
-      display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px;
-    }
-    h1 { font-size: 26px; margin: 0 0 8px; }
-    p { margin: 0 0 14px; opacity: .85; }
-    .card {
-      background: #111827; /* gray-900 */
-      border: 1px solid #1f2937; /* gray-800 */
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
-    textarea {
-      width: 100%; min-height: 280px; resize: vertical;
-      background: #0b1220; color: #e2e8f0;
-      border: 1px solid #22314a; border-radius: 12px;
-      padding: 12px 14px; line-height: 1.4; font-size: 14px;
-      outline: none;
-    }
-    .row { display: grid; gap: 12px; }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-    button {
-      padding: 10px 14px; border-radius: 10px; border: 1px solid #334155;
-      background: #1e293b; color: #e2e8f0; cursor: pointer; font-weight: 600;
-    }
-    button.primary { background: #2563eb; border-color: #2563eb; }
-    button:hover { filter: brightness(1.05); }
-    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .list {
-      border: 1px dashed #334155; padding: 10px; border-radius: 10px;
-      min-height: 180px; background: #0b1220;
-    }
-    .list h3 { margin: 0 0 8px; font-size: 16px; opacity: .9; }
-    .small { font-size: 12px; opacity: .75; }
-    .badge {
-      display: inline-block; font-size: 12px; padding: 3px 8px; border-radius: 999px;
-      border: 1px solid #334155; background: #0b1220; margin-right: 6px;
-    }
-    .footer { opacity: .7; margin-top: 16px; font-size: 12px; text-align: center; }
-    @media (max-width: 900px) {
-      .container { grid-template-columns: 1fr; }
-    }
+    body { margin:0; padding:24px; background:#0f172a; color:#e2e8f0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"; }
+    h1 { margin:0 0 6px; font-size:26px; }
+    p { margin:0 0 12px; opacity:.85; }
+    .wrap { max-width:1200px; margin:0 auto; display:grid; gap:20px; }
+    .grid { display:grid; gap:16px; grid-template-columns: 1.1fr .9fr; }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+    .card { background:#111827; border:1px solid #1f2937; border-radius:var(--r); padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.35); }
+    textarea { width:100%; min-height:260px; resize:vertical; background:#0b1220; color:#e2e8f0; border:1px solid #22314a; border-radius:12px; padding:12px 14px; line-height:1.4; font-size:14px; outline:none; }
+    .row { display:grid; gap:10px; }
+    .controls { display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; }
+    input[type="text"], select { width:100%; background:#0b1220; color:#e2e8f0; border:1px solid #22314a; border-radius:10px; padding:10px 12px; }
+    label { font-size:12px; opacity:.8; display:block; margin-bottom:6px; }
+    button { padding:10px 14px; border-radius:10px; border:1px solid #334155; background:#1e293b; color:#e2e8f0; cursor:pointer; font-weight:600; }
+    button.primary { background:#2563eb; border-color:#2563eb; }
+    button:hover { filter:brightness(1.05); }
+    .cols2 { display:grid; gap:16px; grid-template-columns: 1fr 1fr; }
+    .list { border:1px dashed #334155; padding:10px; border-radius:10px; min-height:120px; background:#0b1220; }
+    .list h3 { margin:0 0 8px; font-size:16px; opacity:.9; }
+    .small { font-size:12px; opacity:.75; }
+    canvas { width:100%; height:auto; background:#064e3b; border-radius:12px; border:1px solid #1f2937; }
+    .dl { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .badge { font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid #334155; background:#0b1220; }
+    .hint { opacity:.75; font-size:12px; margin-top:6px; }
+    .bench { margin-top:8px; font-size:12px; opacity:.8; }
+    .roles { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; font-size:12px; opacity:.85; }
+    .warn { color:#fbbf24; }
+    .ok { color:#22c55e; }
+    .fail { color:#f87171; }
+    hr.sep { border:none;border-top:1px solid #1f2937;margin:14px 0; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <h1>⚽ Bốc thăm chia đội (theo cặp)</h1>
-      <p>Dán danh sách cặp (mỗi dòng 1 cặp). Dấu phân tách có thể là <code>,</code> hoặc <code>-</code> hoặc <code>vs</code>.</p>
-      <div class="row">
-        <textarea id="pairs" placeholder="Ví dụ:
-Messi, Ronaldo
-Neymar - Mbappé
-Kane vs Haaland
-Son, Salah"></textarea>
-        <div class="actions">
-          <button class="primary" id="shuffleBtn">Bốc thăm</button>
-          <button id="reshuffleBtn">Bốc lại</button>
-          <button id="downloadBtn">Tải CSV</button>
-          <span class="badge" id="countBadge">0 cặp</span>
+  <div class="wrap">
+    <div class="grid">
+      <!-- LEFT: Input & pairing -->
+      <div class="card">
+        <h1>⚽ Bốc thăm theo cặp → 2 đội (Sân 7, có vị trí)</h1>
+        <p>Nhập cặp cầu thủ, MỖI NGƯỜI có vị trí <code>GK</code>, <code>DF</code>, <code>MF</code>, <code>FW</code>.<br>
+        Chấp nhận các định dạng: <code>Tên (POS)</code>, <code>Tên/POS</code>, <code>Tên - POS</code>.</p>
+        <div class="row">
+<textarea id="pairs" placeholder="Ví dụ:
+Alisson (GK), Ederson (GK)
+Ramos/DF - Van Dijk/DF
+Kanté - MF, De Bruyne/MF
+Messi FW vs Ronaldo FW
+Salah (FW) - Son (FW)"></textarea>
+          <div class="actions">
+            <button class="primary" id="shuffleBtn">Bốc thăm</button>
+            <button id="reshuffleBtn">Bốc lại</button>
+            <span class="badge" id="countBadge">0 cặp</span>
+          </div>
+        </div>
+
+        <hr class="sep">
+        <div class="controls">
+          <div>
+            <label>Tên đội 1</label>
+            <input id="t1name" type="text" placeholder="Đội 1" value="Đội 1">
+          </div>
+          <div>
+            <label>Tên đội 2</label>
+            <input id="t2name" type="text" placeholder="Đội 2" value="Đội 2">
+          </div>
+          <div>
+            <label>Formation đội 1 (7 người)</label>
+            <select id="t1formation">
+              <option value="2-3-1" selected>2-3-1</option>
+              <option value="3-2-1">3-2-1</option>
+              <option value="2-2-2">2-2-2</option>
+              <option value="3-3">3-3</option>
+              <option value="1-3-2">1-3-2</option>
+            </select>
+          </div>
+          <div>
+            <label>Formation đội 2 (7 người)</label>
+            <select id="t2formation">
+              <option value="2-3-1" selected>2-3-1</option>
+              <option value="3-2-1">3-2-1</option>
+              <option value="2-2-2">2-2-2</option>
+              <option value="3-3">3-3</option>
+              <option value="1-3-2">1-3-2</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions" style="margin-top:10px">
+          <button id="renderBtn">Vẽ sơ đồ 2 đội</button>
+        </div>
+        <div class="hint">7 người = 1 GK + DEF‑MID‑ATT theo formation (tổng 6 cầu thủ ngoài). Thừa/thiếu vị trí sẽ chuyển dự bị hoặc lấp bằng vị trí khác gần nhất.</div>
+      </div>
+
+      <!-- RIGHT: Lists + downloads -->
+      <div class="card">
+        <div class="cols2">
+          <div class="list">
+            <h3 id="t1title">Đội 1</h3>
+            <div class="roles" id="roles1"></div>
+            <div id="team1"></div>
+            <div class="bench" id="bench1"></div>
+            <div class="dl">
+              <button id="copyT1">Copy đội 1</button>
+              <button id="dlT1PNG">Download sơ đồ đội 1 (PNG)</button>
+              <button id="dlT1LINEUP">Download line-up đội 1</button>
+            </div>
+          </div>
+          <div class="list">
+            <h3 id="t2title">Đội 2</h3>
+            <div class="roles" id="roles2"></div>
+            <div id="team2"></div>
+            <div class="bench" id="bench2"></div>
+            <div class="dl">
+              <button id="copyT2">Copy đội 2</button>
+              <button id="dlT2PNG">Download sơ đồ đội 2 (PNG)</button>
+              <button id="dlT2LINEUP">Download line-up đội 2</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="card">
-      <div class="cols">
-        <div class="list">
-          <h3>Đội 1</h3>
-          <div id="team1"></div>
-          <div class="actions" style="margin-top:10px">
-            <button id="copyT1">Copy đội 1</button>
-          </div>
-        </div>
-        <div class="list">
-          <h3>Đội 2</h3>
-          <div id="team2"></div>
-          <div class="actions" style="margin-top:10px">
-            <button id="copyT2">Copy đội 2</button>
-          </div>
-        </div>
+
+    <!-- FORMATION CANVASES -->
+    <div class="grid">
+      <div class="card">
+        <h3 style="margin:0 0 8px">Sơ đồ đội 1</h3>
+        <canvas id="cv1" width="900" height="560"></canvas>
       </div>
-      <div class="footer small">Mỗi cặp: 1 người vào Đội 1, người còn lại vào Đội 2. Không cần server/App Script.</div>
+      <div class="card">
+        <h3 style="margin:0 0 8px">Sơ đồ đội 2</h3>
+        <canvas id="cv2" width="900" height="560"></canvas>
+      </div>
     </div>
+    <div class="small" style="opacity:.65;text-align:center">Nhập đúng vị trí: GK / DF / MF / FW. PNG tải xuống hiển thị y như trên.</div>
   </div>
 
-  <script>
-    const pairsEl = document.getElementById('pairs');
-    const team1El = document.getElementById('team1');
-    const team2El = document.getElementById('team2');
-    const shuffleBtn = document.getElementById('shuffleBtn');
-    const reshuffleBtn = document.getElementById('reshuffleBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const copyT1 = document.getElementById('copyT1');
-    const copyT2 = document.getElementById('copyT2');
-    const countBadge = document.getElementById('countBadge');
+<script>
+  // ====== Parsing with positions ======
+  const pairsEl = document.getElementById('pairs');
+  const t1El = document.getElementById('team1');
+  const t2El = document.getElementById('team2');
+  const bench1El = document.getElementById('bench1');
+  const bench2El = document.getElementById('bench2');
+  const roles1El = document.getElementById('roles1');
+  const roles2El = document.getElementById('roles2');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  const reshuffleBtn = document.getElementById('reshuffleBtn');
+  const renderBtn = document.getElementById('renderBtn');
+  const copyT1 = document.getElementById('copyT1');
+  const copyT2 = document.getElementById('copyT2');
+  const countBadge = document.getElementById('countBadge');
 
-    function parsePairs(text) {
-      const lines = text.split(/[\r\n]+/).map(s => s.trim()).filter(Boolean);
-      const pairs = [];
-      for (const line of lines) {
-        // Split by comma, hyphen, or 'vs'
-        const parts = line.split(/\s*(?:,|vs|-\s*)\s*/i).map(s => s.trim()).filter(Boolean);
-        if (parts.length >= 2) {
-          pairs.push([parts[0], parts[1]]);
+  const t1nameEl = document.getElementById('t1name');
+  const t2nameEl = document.getElementById('t2name');
+  const t1titleEl = document.getElementById('t1title');
+  const t2titleEl = document.getElementById('t2title');
+  const t1formEl = document.getElementById('t1formation');
+  const t2formEl = document.getElementById('t2formation');
+
+  const cv1 = document.getElementById('cv1');
+  const cv2 = document.getElementById('cv2');
+  const dlT1PNG = document.getElementById('dlT1PNG');
+  const dlT2PNG = document.getElementById('dlT2PNG');
+  const dlT1LINEUP = document.getElementById('dlT1LINEUP');
+  const dlT2LINEUP = document.getElementById('dlT2LINEUP');
+
+  function normPos(pos) {
+    const p = (pos||"").toUpperCase().replace(/[^A-Z]/g,"");
+    if (p.startsWith("GK")) return "GK";
+    if (p.startsWith("DF") || p==="D") return "DF";
+    if (p.startsWith("MF") || p==="M" || p==="CM" || p==="DM" || p==="AM" || p==="LM" || p==="RM") return "MF";
+    if (p.startsWith("FW") || p==="F" || p==="ST" || p==="CF" || p==="LW" || p==="RW") return "FW";
+    return ""; // unknown
+  }
+
+  function parsePlayer(raw) {
+    let s = raw.trim();
+    // Patterns: Name (POS) | Name / POS | Name - POS | Name POS (if last token looks like a POS)
+    let name = s, pos = "";
+
+    // Try (POS)
+    let m = s.match(/^(.+?)\\s*\\(([^)]+)\\)\\s*$/);
+    if (m) { name = m[1].trim(); pos = normPos(m[2]); return {name, pos}; }
+
+    // Try with slash or dash separators
+    m = s.match(/^(.+?)[\\s\\/\\-]+([A-Za-z]{1,3})\\s*$/);
+    if (m) { name = m[1].trim(); pos = normPos(m[2]); return {name, pos}; }
+
+    // Try ending token as POS
+    const parts = s.split(/\\s+/);
+    if (parts.length>1) {
+      const last = parts[parts.length-1];
+      const np = normPos(last);
+      if (np) { pos = np; name = parts.slice(0,-1).join(" "); return {name, pos}; }
+    }
+
+    return {name: s, pos: ""};
+  }
+
+  function parsePairs(text) {
+    const lines = text.split(/[\\r\\n]+/).map(s => s.trim()).filter(Boolean);
+    const pairs = [];
+    for (const line of lines) {
+      const parts = line.split(/\\s*(?:,|vs|-\\s*)\\s*/i).map(s => s.trim()).filter(Boolean);
+      if (parts.length >= 2) {
+        const p1 = parsePlayer(parts[0]);
+        const p2 = parsePlayer(parts[1]);
+        pairs.push([p1, p2]);
+      }
+    }
+    return pairs;
+  }
+
+  // Random split by pairs → team1/team2 lists of players {name,pos}
+  function randomizePairs(pairs) {
+    const t1 = [], t2 = [];
+    for (const [a, b] of pairs) {
+      if (Math.random() < 0.5) { t1.push(a); t2.push(b); }
+      else { t1.push(b); t2.push(a); }
+    }
+    return { t1, t2 };
+  }
+
+  function renderLists({ t1, t2 }) {
+    t1El.innerHTML = t1.map((p,i)=>`<div>${i+1}. ${escapeHtml(p.name)} <span class="small" style="opacity:.7">(${p.pos||"?"})</span></div>`).join("");
+    t2El.innerHTML = t2.map((p,i)=>`<div>${i+1}. ${escapeHtml(p.name)} <span class="small" style="opacity:.7">(${p.pos||"?"})</span></div>`).join("");
+    countBadge.textContent = `${Math.max(t1.length, t2.length)} cặp`;
+    t1titleEl.textContent = t1nameEl.value || "Đội 1";
+    t2titleEl.textContent = t2nameEl.value || "Đội 2";
+
+    // Role counts
+    roles1El.innerHTML = roleBadges(t1);
+    roles2El.innerHTML = roleBadges(t2);
+
+    // Benches shown after render (when we know formation needs)
+    bench1El.textContent = "";
+    bench2El.textContent = "";
+  }
+
+  function roleBadges(list) {
+    const c = countRoles(list);
+    return `<span class="badge">GK: ${c.GK}</span>
+            <span class="badge">DF: ${c.DF}</span>
+            <span class="badge">MF: ${c.MF}</span>
+            <span class="badge">FW: ${c.FW}</span>`;
+  }
+
+  function countRoles(list) {
+    const c = {GK:0, DF:0, MF:0, FW:0, UNKNOWN:0};
+    for (const p of list) {
+      if (p.pos==="GK") c.GK++;
+      else if (p.pos==="DF") c.DF++;
+      else if (p.pos==="MF") c.MF++;
+      else if (p.pos==="FW") c.FW++;
+      else c.UNKNOWN++;
+    }
+    return c;
+  }
+
+  function escapeHtml(s) {
+    return (s||"").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+  }
+
+  let latest = { t1: [], t2: [] };
+
+  function doShuffle() {
+    const pairs = parsePairs(pairsEl.value);
+    if (!pairs.length) { alert("Hãy nhập ít nhất 1 cặp (mỗi dòng 1 cặp)."); return; }
+    latest = randomizePairs(pairs);
+    renderLists(latest);
+  }
+
+  shuffleBtn.addEventListener('click', doShuffle);
+  reshuffleBtn.addEventListener('click', doShuffle);
+  t1nameEl.addEventListener('input', ()=>renderLists(latest));
+  t2nameEl.addEventListener('input', ()=>renderLists(latest));
+
+  // ====== Allocation to formation (7-a-side) ======
+  function parseFormation(f) {
+    const parts = f.split('-').map(n=>parseInt(n.trim(),10)).filter(n=>!Number.isNaN(n));
+    const arr = parts.slice(-3);
+    while (arr.length<3) arr.unshift(0);
+    const sum = arr[0]+arr[1]+arr[2];
+    return { def:arr[0], mid:arr[1], att:arr[2], sum };
+  }
+
+  // Allocate players to: [GK] + DEF + MID + ATT following desired counts; extras go to bench.
+  // If role shortage, fill with best-available other roles.
+  function allocateLineup(players, formation) {
+    const want = { GK:1, DF:formation.def, MF:formation.mid, FW:formation.att };
+    const byRole = { GK:[], DF:[], MF:[], FW:[], UNKNOWN:[] };
+    for (const p of players) {
+      (byRole[p.pos] ? byRole[p.pos] : byRole.UNKNOWN).push(p);
+    }
+
+    const lineup = [];
+
+    function take(role, n) {
+      const picked = [];
+      while (n>0 && byRole[role].length) { picked.push(byRole[role].shift()); n--; }
+      return picked;
+    }
+
+    // 1) Exact-role picks
+    lineup.push(...take("GK", want.GK));
+    lineup.push(...take("DF", want.DF));
+    lineup.push(...take("MF", want.MF));
+    lineup.push(...take("FW", want.FW));
+
+    // 2) Fill shortages with other roles (priority: similar lines)
+    function fill(role, remaining) {
+      const prefs = role==="DF" ? ["MF","FW","UNKNOWN"]
+                  : role==="MF" ? ["DF","FW","UNKNOWN"]
+                  : role==="FW" ? ["MF","DF","UNKNOWN"]
+                  : ["DF","MF","FW","UNKNOWN"]; // GK fallback (rare)
+      for (const pr of prefs) {
+        while (remaining>0 && byRole[pr].length) {
+          lineup.push(byRole[pr].shift()); remaining--;
         }
       }
-      return pairs;
+      return remaining;
     }
 
-    function randomizePairs(pairs) {
-      const t1 = [], t2 = [];
-      for (const [a, b] of pairs) {
-        if (Math.random() < 0.5) {
-          t1.push(a); t2.push(b);
-        } else {
-          t1.push(b); t2.push(a);
-        }
+    // compute shortages
+    const have = { GK: lineup.filter(p=>p.pos==="GK").length,
+                   DF: lineup.filter(p=>p.pos==="DF").length,
+                   MF: lineup.filter(p=>p.pos==="MF").length,
+                   FW: lineup.filter(p=>p.pos==="FW").length };
+    if (have.GK < want.GK) fill("GK", want.GK - have.GK);
+    if (have.DF < want.DF) fill("DF", want.DF - have.DF);
+    if (have.MF < want.MF) fill("MF", want.MF - have.MF);
+    if (have.FW < want.FW) fill("FW", want.FW - have.FW);
+
+    // 3) Ensure size = 7 max; extras to bench
+    const onField = lineup.slice(0, 1 + formation.def + formation.mid + formation.att);
+    const bench = []
+      .concat(lineup.slice(onField.length))
+      .concat(byRole.GK, byRole.DF, byRole.MF, byRole.FW, byRole.UNKNOWN);
+
+    // Return with a label for each player (include pos)
+    return { onField, bench };
+  }
+
+  // ====== Pitch drawing (7-a-side) ======
+  function layoutPositions7(formation, side='left') {
+    const {def, mid, att} = formation;
+    const rowsX = [0.10, 0.30, 0.55, 0.82];
+    let xGK=rowsX[0], xD=rowsX[1], xM=rowsX[2], xA=rowsX[3];
+    if (side==='right') { xGK=1-xGK; xD=1-xD; xM=1-xM; xA=1-xA; }
+
+    const pos = [];
+    pos.push([xGK, 0.5, 'GK']);
+
+    function spreadY(n) {
+      if (n<=0) return [];
+      if (n===1) return [0.5];
+      const pad = 0.12, span = 1 - pad*2, step = span/(n-1);
+      return Array.from({length:n}, (_,i)=> pad + i*step);
+    }
+    spreadY(def).forEach(y=>pos.push([xD, y, 'DF']));
+    spreadY(mid).forEach(y=>pos.push([xM, y, 'MF']));
+    spreadY(att).forEach(y=>pos.push([xA, y, 'FW']));
+
+    return pos; // length should be 7
+  }
+
+  function drawPitch7(ctx, W, H) {
+    ctx.fillStyle="#065f46"; ctx.fillRect(0,0,W,H);
+    for (let i=0;i<8;i++) {
+      ctx.fillStyle = i%2? "rgba(255,255,255,0.025)" : "rgba(0,0,0,0.02)";
+      ctx.fillRect(i*(W/8), 0, W/8, H);
+    }
+    ctx.strokeStyle="#d1fae5"; ctx.lineWidth=2;
+    ctx.strokeRect(10,10,W-20,H-20);
+    ctx.beginPath(); ctx.moveTo(W/2, 10); ctx.lineTo(W/2, H-10); ctx.stroke();
+    ctx.beginPath(); ctx.arc(W/2, H/2, 50, 0, Math.PI*2); ctx.stroke();
+    const boxW = 90, boxH = 220;
+    ctx.strokeRect(10, (H-boxH)/2, boxW, boxH);
+    ctx.strokeRect(W-10-boxW, (H-boxH)/2, boxW, boxH);
+  }
+
+  function drawTeamOnCanvas7(canvas, formation, teamName, assigned, side='left') {
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    drawPitch7(ctx, W, H);
+
+    const pos = layoutPositions7(formation, side);
+    const onField = assigned.onField;
+    const bench = assigned.bench;
+
+    // Title
+    ctx.fillStyle="#e2e8f0";
+    ctx.font = "bold 22px system-ui, -apple-system, Segoe UI, Roboto";
+    ctx.textAlign = "center";
+    ctx.fillText(`${teamName} — ${formation.def}-${formation.mid}-${formation.att}`, W/2, 36);
+
+    // Place names onto positions (order: GK + DF* + MF* + FW*)
+    for (let i=0;i<pos.length;i++) {
+      const [nx, ny, role] = pos[i];
+      const x = 10 + nx*(W-20);
+      const y = 10 + ny*(H-20);
+      const r = 18;
+
+      const p = onField[i]; // may be undefined if shortage
+
+      // marker
+      ctx.beginPath();
+      ctx.fillStyle = role==='GK' ? "#1d4ed8" : "#111827";
+      ctx.strokeStyle="#f8fafc";
+      ctx.lineWidth=2;
+      ctx.arc(x, y, r, 0, Math.PI*2);
+      ctx.fill(); ctx.stroke();
+
+      // name + role
+      const label = p ? `${p.name}` : role;
+      ctx.fillStyle="#f8fafc";
+      ctx.font = "600 13px system-ui, -apple-system, Segoe UI";
+      ctx.textAlign = "center";
+      wrapText(ctx, label, x, y - r - 6, 160, 14);
+
+      // tiny role below
+      ctx.fillStyle="rgba(248,250,252,.8)";
+      ctx.font = "11px system-ui, -apple-system";
+      ctx.fillText(p ? `(${p.pos||role})` : `(${role})`, x, y + r + 14);
+    }
+
+    return bench;
+  }
+
+  function wrapText(ctx, text, cx, startY, maxWidth, lineHeight) {
+    if (!text) return;
+    const words = text.split(" ");
+    let line = "", y = startY;
+    for (let n = 0; n < words.length; n++) {
+      const test = line ? line + " " + words[n] : words[n];
+      const m = ctx.measureText(test);
+      if (m.width > maxWidth && n > 0) {
+        ctx.fillText(line, cx, y);
+        line = words[n];
+        y += lineHeight;
+      } else {
+        line = test;
       }
-      return { t1, t2 };
     }
+    ctx.fillText(line, cx, y);
+  }
 
-    function renderTeams({ t1, t2 }) {
-      team1El.innerHTML = t1.map((n, i) => `<div>${i+1}. ${escapeHtml(n)}</div>`).join("");
-      team2El.innerHTML = t2.map((n, i) => `<div>${i+1}. ${escapeHtml(n)}</div>`).join("");
-      countBadge.textContent = `${Math.max(t1.length, t2.length)} cặp`;
-    }
+  // Render btn: allocate + draw both canvases
+  document.getElementById('renderBtn').addEventListener('click', ()=>{
+    if (!latest.t1.length || !latest.t2.length) doShuffle();
+    const t1n = t1nameEl.value || "Đội 1";
+    const t2n = t2nameEl.value || "Đội 2";
+    const f1 = parseFormation(t1formEl.value);
+    const f2 = parseFormation(t2formEl.value);
 
-    function escapeHtml(s) {
-      return s.replace(/[&<>"']/g, m => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-      }[m]));
-    }
+    const asg1 = allocateLineup(latest.t1, f1);
+    const asg2 = allocateLineup(latest.t2, f2);
 
-    function getCSV(t1, t2) {
-      const rows = [["Đội 1","Đội 2"]];
-      const max = Math.max(t1.length, t2.length);
-      for (let i=0;i<max;i++) rows.push([t1[i]||"", t2[i]||""]);
-      return rows.map(r => r.map(x => `"${(x||"").replace(/"/g,'""')}"`).join(",")).join("\n");
-    }
+    const bench1 = drawTeamOnCanvas7(cv1, f1, t1n, asg1, 'left');
+    const bench2 = drawTeamOnCanvas7(cv2, f2, t2n, asg2, 'right');
 
-    let lastResult = { t1: [], t2: [] };
+    bench1El.textContent = bench1.length ? ("Dự bị: " + bench1.map(p=>`${p.name}${p.pos?` (${p.pos})`:""}`).join(", ")) : "";
+    bench2El.textContent = bench2.length ? ("Dự bị: " + bench2.map(p=>`${p.name}${p.pos?` (${p.pos})`:""}`).join(", ")) : "";
+  });
 
-    function shuffle() {
-      const pairs = parsePairs(pairsEl.value);
-      if (pairs.length === 0) {
-        alert("Hãy nhập ít nhất 1 cặp (mỗi dòng 1 cặp).");
-        return;
-      }
-      lastResult = randomizePairs(pairs);
-      renderTeams(lastResult);
-    }
+  // Downloads
+  function downloadPNG(canvas, filename) {
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = filename;
+    a.click();
+  }
+  document.getElementById('dlT1PNG').addEventListener('click', ()=>{
+    const name = (t1nameEl.value || "Doi1").replace(/\\s+/g,'_');
+    downloadPNG(cv1, `${name}_so_do_7nguoi.png`);
+  });
+  document.getElementById('dlT2PNG').addEventListener('click', ()=>{
+    const name = (t2nameEl.value || "Doi2").replace(/\\s+/g,'_');
+    downloadPNG(cv2, `${name}_so_do_7nguoi.png`);
+  });
 
-    shuffleBtn.addEventListener('click', shuffle);
-    reshuffleBtn.addEventListener('click', shuffle);
+  function downloadLineup(players, teamName) {
+    const f = parseFormation(teamName=== (t1nameEl.value || "Đội 1") ? t1formEl.value : t2formEl.value);
+    const asg = allocateLineup(players, f);
+    const onField = asg.onField;
+    const bench = asg.bench;
+    const lines = [];
+    lines.push(`# ${teamName} (7 người — ${f.def}-${f.mid}-${f.att})`);
+    if (onField[0]) lines.push(`GK: ${onField[0].name}`);
+    const rest = onField.slice(1).map(p=>`${p.name}${p.pos?` (${p.pos})`:""}`);
+    lines.push(`Outfield (6): ${rest.join(", ")}`);
+    if (bench.length) lines.push(`Dự bị: ${bench.map(p=>`${p.name}${p.pos?` (${p.pos})`:""}`).join(", ")}`);
+    const blob = new Blob([lines.join("\\n")], {type:"text/plain;charset=utf-8"});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${teamName.replace(/\\s+/g,'_')}_lineup.txt`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  document.getElementById('dlT1LINEUP').addEventListener('click', ()=>{
+    const name = t1nameEl.value || "Doi1";
+    downloadLineup(latest.t1, name);
+  });
+  document.getElementById('dlT2LINEUP').addEventListener('click', ()=>{
+    const name = t2nameEl.value || "Doi2";
+    downloadLineup(latest.t2, name);
+  });
 
-    downloadBtn.addEventListener('click', () => {
-      if (!lastResult.t1.length && !lastResult.t2.length) shuffle();
-      const csv = getCSV(lastResult.t1, lastResult.t2);
-      const blob = new Blob([csv], {type: "text/csv;charset=utf-8"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = "chia_doi.csv";
-      document.body.appendChild(a); a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-
-    function copy(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.activeElement;
-        const old = btn.textContent;
-        btn.textContent = "Đã copy!";
-        setTimeout(()=> btn.textContent = old, 1000);
-      }).catch(()=> alert("Không copy được. Hãy kiểm tra quyền clipboard."));
-    }
-
-    copyT1.addEventListener('click', () => {
-      if (!lastResult.t1.length) shuffle();
-      copy(lastResult.t1.join(", "));
-    });
-    copyT2.addEventListener('click', () => {
-      if (!lastResult.t2.length) shuffle();
-      copy(lastResult.t2.join(", "));
-    });
-
-    // Demo content
-    pairsEl.value = "Messi, Ronaldo\nNeymar - Mbappé\nKane vs Haaland\nSon, Salah";
-  </script>
+  // Demo content
+  pairsEl.value = "Alisson (GK), Ederson (GK)\\nRamos/DF - Van Dijk/DF\\nKanté - MF, De Bruyne/MF\\nMessi FW vs Ronaldo FW\\nSalah (FW) - Son (FW)";
+</script>
 </body>
 </html>
