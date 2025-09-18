@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bốc thăm chia đội (theo cặp)</title>
+  <style>
+    :root { --radius: 14px; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      margin: 0; padding: 24px;
+      background: #0f172a; /* slate-900 */
+      color: #e2e8f0;      /* slate-200 */
+    }
+    .container {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px;
+    }
+    h1 { font-size: 26px; margin: 0 0 8px; }
+    p { margin: 0 0 14px; opacity: .85; }
+    .card {
+      background: #111827; /* gray-900 */
+      border: 1px solid #1f2937; /* gray-800 */
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    textarea {
+      width: 100%; min-height: 280px; resize: vertical;
+      background: #0b1220; color: #e2e8f0;
+      border: 1px solid #22314a; border-radius: 12px;
+      padding: 12px 14px; line-height: 1.4; font-size: 14px;
+      outline: none;
+    }
+    .row { display: grid; gap: 12px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    button {
+      padding: 10px 14px; border-radius: 10px; border: 1px solid #334155;
+      background: #1e293b; color: #e2e8f0; cursor: pointer; font-weight: 600;
+    }
+    button.primary { background: #2563eb; border-color: #2563eb; }
+    button:hover { filter: brightness(1.05); }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .list {
+      border: 1px dashed #334155; padding: 10px; border-radius: 10px;
+      min-height: 180px; background: #0b1220;
+    }
+    .list h3 { margin: 0 0 8px; font-size: 16px; opacity: .9; }
+    .small { font-size: 12px; opacity: .75; }
+    .badge {
+      display: inline-block; font-size: 12px; padding: 3px 8px; border-radius: 999px;
+      border: 1px solid #334155; background: #0b1220; margin-right: 6px;
+    }
+    .footer { opacity: .7; margin-top: 16px; font-size: 12px; text-align: center; }
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>⚽ Bốc thăm chia đội (theo cặp)</h1>
+      <p>Dán danh sách cặp (mỗi dòng 1 cặp). Dấu phân tách có thể là <code>,</code> hoặc <code>-</code> hoặc <code>vs</code>.</p>
+      <div class="row">
+        <textarea id="pairs" placeholder="Ví dụ:
+Messi, Ronaldo
+Neymar - Mbappé
+Kane vs Haaland
+Son, Salah"></textarea>
+        <div class="actions">
+          <button class="primary" id="shuffleBtn">Bốc thăm</button>
+          <button id="reshuffleBtn">Bốc lại</button>
+          <button id="downloadBtn">Tải CSV</button>
+          <span class="badge" id="countBadge">0 cặp</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cols">
+        <div class="list">
+          <h3>Đội 1</h3>
+          <div id="team1"></div>
+          <div class="actions" style="margin-top:10px">
+            <button id="copyT1">Copy đội 1</button>
+          </div>
+        </div>
+        <div class="list">
+          <h3>Đội 2</h3>
+          <div id="team2"></div>
+          <div class="actions" style="margin-top:10px">
+            <button id="copyT2">Copy đội 2</button>
+          </div>
+        </div>
+      </div>
+      <div class="footer small">Mỗi cặp: 1 người vào Đội 1, người còn lại vào Đội 2. Không cần server/App Script.</div>
+    </div>
+  </div>
+
+  <script>
+    const pairsEl = document.getElementById('pairs');
+    const team1El = document.getElementById('team1');
+    const team2El = document.getElementById('team2');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const reshuffleBtn = document.getElementById('reshuffleBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const copyT1 = document.getElementById('copyT1');
+    const copyT2 = document.getElementById('copyT2');
+    const countBadge = document.getElementById('countBadge');
+
+    function parsePairs(text) {
+      const lines = text.split(/[\r\n]+/).map(s => s.trim()).filter(Boolean);
+      const pairs = [];
+      for (const line of lines) {
+        // Split by comma, hyphen, or 'vs'
+        const parts = line.split(/\s*(?:,|vs|-\s*)\s*/i).map(s => s.trim()).filter(Boolean);
+        if (parts.length >= 2) {
+          pairs.push([parts[0], parts[1]]);
+        }
+      }
+      return pairs;
+    }
+
+    function randomizePairs(pairs) {
+      const t1 = [], t2 = [];
+      for (const [a, b] of pairs) {
+        if (Math.random() < 0.5) {
+          t1.push(a); t2.push(b);
+        } else {
+          t1.push(b); t2.push(a);
+        }
+      }
+      return { t1, t2 };
+    }
+
+    function renderTeams({ t1, t2 }) {
+      team1El.innerHTML = t1.map((n, i) => `<div>${i+1}. ${escapeHtml(n)}</div>`).join("");
+      team2El.innerHTML = t2.map((n, i) => `<div>${i+1}. ${escapeHtml(n)}</div>`).join("");
+      countBadge.textContent = `${Math.max(t1.length, t2.length)} cặp`;
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, m => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[m]));
+    }
+
+    function getCSV(t1, t2) {
+      const rows = [["Đội 1","Đội 2"]];
+      const max = Math.max(t1.length, t2.length);
+      for (let i=0;i<max;i++) rows.push([t1[i]||"", t2[i]||""]);
+      return rows.map(r => r.map(x => `"${(x||"").replace(/"/g,'""')}"`).join(",")).join("\n");
+    }
+
+    let lastResult = { t1: [], t2: [] };
+
+    function shuffle() {
+      const pairs = parsePairs(pairsEl.value);
+      if (pairs.length === 0) {
+        alert("Hãy nhập ít nhất 1 cặp (mỗi dòng 1 cặp).");
+        return;
+      }
+      lastResult = randomizePairs(pairs);
+      renderTeams(lastResult);
+    }
+
+    shuffleBtn.addEventListener('click', shuffle);
+    reshuffleBtn.addEventListener('click', shuffle);
+
+    downloadBtn.addEventListener('click', () => {
+      if (!lastResult.t1.length && !lastResult.t2.length) shuffle();
+      const csv = getCSV(lastResult.t1, lastResult.t2);
+      const blob = new Blob([csv], {type: "text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = "chia_doi.csv";
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    function copy(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.activeElement;
+        const old = btn.textContent;
+        btn.textContent = "Đã copy!";
+        setTimeout(()=> btn.textContent = old, 1000);
+      }).catch(()=> alert("Không copy được. Hãy kiểm tra quyền clipboard."));
+    }
+
+    copyT1.addEventListener('click', () => {
+      if (!lastResult.t1.length) shuffle();
+      copy(lastResult.t1.join(", "));
+    });
+    copyT2.addEventListener('click', () => {
+      if (!lastResult.t2.length) shuffle();
+      copy(lastResult.t2.join(", "));
+    });
+
+    // Demo content
+    pairsEl.value = "Messi, Ronaldo\nNeymar - Mbappé\nKane vs Haaland\nSon, Salah";
+  </script>
+</body>
+</html>
