@@ -1,340 +1,135 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bốc thăm & Sơ đồ 7 người (theo cặp + vị trí) — V3.4</title>
-  <style>
-    :root { --r: 14px; }
-    * { box-sizing: border-box; }
-    body { margin:0; padding:24px; background:#0f172a; color:#e2e8f0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"; }
-    h1 { margin:0 0 6px; font-size:26px; }
-    p { margin:0 0 12px; opacity:.85; }
-    .wrap { max-width:1200px; margin:0 auto; display:grid; gap:20px; }
-    .grid { display:grid; gap:16px; grid-template-columns: 1.1fr .9fr; }
-    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
-    .card { background:#111827; border:1px solid #1f2937; border-radius:var(--r); padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.35); }
-    textarea { width:100%; min-height:260px; resize:vertical; background:#0b1220; color:#e2e8f0; border:1px solid #22314a; border-radius:12px; padding:12px 14px; line-height:1.4; font-size:14px; outline:none; }
-    .row { display:grid; gap:10px; }
-    .controls { display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
-    .actions { display:flex; gap:10px; flex-wrap:wrap; }
-    input[type="text"], select { width:100%; background:#0b1220; color:#e2e8f0; border:1px solid #22314a; border-radius:10px; padding:10px 12px; }
-    label { font-size:12px; opacity:.8; display:block; margin-bottom:6px; }
-    button { padding:10px 14px; border-radius:10px; border:1px solid #334155; background:#1e293b; color:#e2e8f0; cursor:pointer; font-weight:600; }
-    button.primary { background:#2563eb; border-color:#2563eb; }
-    button:hover { filter:brightness(1.05); }
-    .cols2 { display:grid; gap:16px; grid-template-columns: 1fr 1fr; }
-    .list { border:1px dashed #334155; padding:10px; border-radius:10px; min-height:120px; background:#0b1220; }
-    .list h3 { margin:0 0 8px; font-size:16px; opacity:.9; }
-    .small { font-size:12px; opacity:.75; }
-    canvas { width:100%; height:auto; background:#064e3b; border-radius:12px; border:1px solid #1f2937; }
-    .dl { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-    .badge { font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid #334155; background:#0b1220; }
-    .hint { opacity:.75; font-size:12px; margin-top:6px; }
-    .bench { margin-top:8px; font-size:12px; opacity:.8; }
-    .roles { display:flex; gap:8px; flex-wrap:wrap; margin:6px 0; font-size:12px; opacity:.85; }
-    hr.sep { border:none;border-top:1px solid #1f2937;margin:14px 0; }
-    .err { display:none; padding:10px; border-radius:10px; background:#7f1d1d; border:1px solid #b91c1c; color:#fff; font-size:13px; }
-    .err.show { display:block; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bốc thăm & Sơ đồ 7 người — V3.7.0</title>
+<style>
+  body{margin:0;padding:24px;background:#0f172a;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  .wrap{max-width:1280px;margin:0 auto;display:grid;gap:18px}
+  .grid{display:grid;gap:16px;grid-template-columns:1.1fr .9fr}
+  @media(max-width:1100px){.grid{grid-template-columns:1fr}}
+  .card{background:#111827;border:1px solid #1f2937;border-radius:12px;padding:16px}
+  textarea{width:100%;min-height:220px;resize:vertical;background:#0b1220;color:#e2e8f0;border:1px solid #22314a;border-radius:12px;padding:12px 14px;line-height:1.4;font-size:14px;outline:none}
+  input,select{width:100%;background:#0b1220;color:#e2e8f0;border:1px solid #22314a;border-radius:10px;padding:8px 10px}
+  input[type="color"]{height:36px;padding:0}
+  button{padding:10px 14px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;cursor:pointer;font-weight:600}
+  button.primary{background:#2563eb;border-color:#2563eb}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .controls{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
+  .cols2{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+  .list{border:1px dashed #334155;padding:10px;border-radius:10px;min-height:120px;background:#0b1220}
+  .roles{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0;font-size:12px;opacity:.85}
+  .bench{margin-top:8px;font-size:12px;opacity:.85}
+  .badge{font-size:12px;padding:3px 8px;border-radius:999px;border:1px solid #334155;background:#0b1220}
+  canvas{width:100%;height:auto;background:#0f172a;border-radius:14px}
+  h1{margin:0 0 8px}
+  .note{font-size:13px;opacity:.85}
+  .status{margin-left:auto;font-size:12px;opacity:.85}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="grid">
-      <!-- LEFT: Input & pairing -->
-      <div class="card">
-        <h1>⚽ Bốc thăm theo cặp → 2 đội (Sân 7, có vị trí) — V3.4</h1>
-        <p>Nhập cặp cầu thủ, mỗi người có vị trí <code>GK</code>, <code>DF</code>, <code>MF</code>, <code>FW</code>.<br>
-        Chấp nhận: <code>Tên (POS)</code>, <code>Tên/POS</code>, <code>Tên - POS</code>, hoặc <code>Tên POS</code> (POS là từ cuối).</p>
-        <div class="row">
-<textarea id="pairs" placeholder="Alisson (GK), Ederson (GK)
+<div class="wrap">
+  <div class="grid">
+    <div class="card">
+      <h1 style="display:flex;gap:10px;align-items:center">⚽ Bốc thăm theo cặp → 2 đội (1 sân) — V3.7.0 <span id="status" class="status">Ready</span></h1>
+      <p class="note">Mỗi dòng 1 cặp. Chấp nhận: <code>-</code>, <code>–</code>, <code>—</code>, <code>,</code>, <code>;</code>, <code>|</code>, <code>vs</code>. Vị trí: <code>(DF)</code>, <code>/DF</code>, hoặc để cuối tên.</p>
+      <textarea id="pairs">Alisson (GK) – Ederson (GK)
 Ramos/DF - Van Dijk/DF
 Kante - MF, De Bruyne/MF
 Messi FW vs Ronaldo FW
-Salah (FW) - Son (FW)"></textarea>
-          <div class="actions">
-            <button class="primary" id="shuffleBtn">Bốc thăm</button>
-            <button id="reshuffleBtn">Bốc lại</button>
-            <span class="badge" id="countBadge">0 cặp</span>
-          </div>
-          <div id="err" class="err"></div>
-        </div>
-
-        <hr class="sep">
-        <div class="controls">
-          <div>
-            <label>Tên đội 1</label>
-            <input id="t1name" type="text" placeholder="Đội 1" value="Đội 1">
-          </div>
-          <div>
-            <label>Tên đội 2</label>
-            <input id="t2name" type="text" placeholder="Đội 2" value="Đội 2">
-          </div>
-          <div>
-            <label>Formation đội 1 (7 người)</label>
-            <select id="t1formation">
-              <option value="2-3-1">2-3-1</option>
-              <option value="3-2-1" selected>3-2-1</option>
-              <option value="2-2-2">2-2-2</option>
-              <option value="3-3">3-3</option>
-              <option value="1-3-2">1-3-2</option>
-            </select>
-          </div>
-          <div>
-            <label>Formation đội 2 (7 người)</label>
-            <select id="t2formation">
-              <option value="2-3-1">2-3-1</option>
-              <option value="3-2-1" selected>3-2-1</option>
-              <option value="2-2-2">2-2-2</option>
-              <option value="3-3">3-3</option>
-              <option value="1-3-2">1-3-2</option>
-            </select>
-          </div>
-        </div>
-        <div class="actions" style="margin-top:10px">
-          <button id="renderBtn">Vẽ sơ đồ 2 đội</button>
-        </div>
-        <div class="hint">Nhận các dấu tách: <code>,</code> <code>;</code> <code>|</code> <code>-</code> <code>–</code> <code>—</code> và từ khóa <code>vs</code>. Không dùng chữ đơn <code>v</code>.</div>
+Salah (FW) | Son (FW)</textarea>
+      <div class="actions" style="margin-top:8px">
+        <button class="primary" id="shuffleBtn">Bốc thăm</button>
+        <button id="reshuffleBtn">Bốc lại</button>
+        <span class="badge" id="countBadge">0 cặp</span>
       </div>
-
-      <!-- RIGHT: Lists + downloads -->
-      <div class="card">
-        <div class="cols2">
-          <div class="list">
-            <h3 id="t1title">Đội 1</h3>
-            <div class="roles" id="roles1"></div>
-            <div id="team1"></div>
-            <div class="bench" id="bench1"></div>
-            <div class="dl">
-              <button id="dlT1PNG">Download sơ đồ đội 1 (PNG)</button>
-              <button id="dlT1LINEUP">Download line-up đội 1</button>
-            </div>
-          </div>
-          <div class="list">
-            <h3 id="t2title">Đội 2</h3>
-            <div class="roles" id="roles2"></div>
-            <div id="team2"></div>
-            <div class="bench" id="bench2"></div>
-            <div class="dl">
-              <button id="dlT2PNG">Download sơ đồ đội 2 (PNG)</button>
-              <button id="dlT2LINEUP">Download line-up đội 2</button>
-            </div>
-          </div>
+      <div class="controls" style="margin-top:10px">
+        <div><label>Tên đội 1</label><input id="t1name" value="Đội 1"></div>
+        <div><label>Tên đội 2</label><input id="t2name" value="Đội 2"></div>
+        <div><label>Formation đội 1</label>
+          <select id="t1formation"><option>2-3-1</option><option selected>3-2-1</option><option>2-2-2</option><option>3-3</option></select>
         </div>
+        <div><label>Formation đội 2</label>
+          <select id="t2formation"><option>2-3-1</option><option selected>3-2-1</option><option>2-2-2</option><option>3-3</option></select>
+        </div>
+        <div><label>Màu áo đội 1</label><input type="color" id="color1" value="#2563eb"></div>
+        <div><label>Màu áo đội 2</label><input type="color" id="color2" value="#ef4444"></div>
+        <div><label>Cỡ vòng tròn</label><input id="sizeRange" type="range" min="12" max="28" value="18"></div>
+        <div><label>Hiển thị</label><select id="labelMode"><option value="name" selected>Tên</option><option value="number">Số áo</option></select></div>
+        <div><label>Outline chữ</label>
+          <select id="outlineMode">
+            <option value="black" selected>On (đen)</option>
+            <option value="white">On (trắng)</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button id="renderBtn">Vẽ sơ đồ 2 đội</button>
+        <button id="dlPNG">Download PNG</button>
       </div>
     </div>
 
-    <!-- FORMATION CANVASES -->
-    <div class="grid">
-      <div class="card">
-        <h3 style="margin:0 0 8px">Sơ đồ đội 1</h3>
-        <canvas id="cv1" width="900" height="560"></canvas>
-      </div>
-      <div class="card">
-        <h3 style="margin:0 0 8px">Sơ đồ đội 2</h3>
-        <canvas id="cv2" width="900" height="560"></canvas>
+    <div class="card">
+      <div class="cols2">
+        <div class="list"><h3>Đội 1</h3><div class="roles" id="roles1"></div><div id="team1"></div><div class="bench" id="bench1"></div></div>
+        <div class="list"><h3>Đội 2</h3><div class="roles" id="roles2"></div><div id="team2"></div><div class="bench" id="bench2"></div></div>
       </div>
     </div>
-    <div class="small" style="opacity:.65;text-align:center">Mặc định formation: 3-2-1. GK bám vạch khung thành.</div>
   </div>
 
+  <div><canvas id="cvBoth" width="1400" height="720"></canvas></div>
+</div>
+
 <script>
-  // ====== Helpers ======
-  const errBox = document.getElementById('err');
-  function showErr(msg){ errBox.textContent = msg || ""; errBox.className = "err" + (msg ? " show" : ""); }
-  function cleanInline(s){
-    return (s||"")
-      .replace(/\uFEFF/g, "")         // BOM
-      .replace(/[\u2000-\u200D]/g, "")// zero-width
-      .replace(/\u00A0/g, " ")        // NBSP
-      .replace(/\u202F/g, " ")        // NNBSP
-      .replace(/[\u2013\u2014]/g, "-")// en/em dash -> hyphen
-      .replace(/\s+/g, " ")
-      .trim();
-  }
-  function normalizeNewlines(text){
-    return (text||"").replace(/\r\n/g,"\n").replace(/\r/g,"\n").replace(/\uFEFF/g,"");
-  }
-  function normPos(pos){
-    const p = cleanInline(pos).toUpperCase().replace(/[^A-Z]/g,"");
-    if (p.startsWith("GK")) return "GK";
-    if (p.startsWith("DF") || p==="D") return "DF";
-    if (p.startsWith("MF") || p==="M") return "MF";
-    if (p.startsWith("FW") || p==="F" || p==="ST" || p==="CF") return "FW";
-    return "";
-  }
-  function parsePlayer(raw){
-    let s = cleanInline(raw), name=s, pos="";
-    let m = s.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
-    if (m){ name=cleanInline(m[1]); pos=normPos(m[2]); return {name,pos}; }
-    m = s.match(/^(.+?)\s*[/\-|;–—]\s*([A-Za-z]{1,3})\s*$/);
-    if (m){ name=cleanInline(m[1]); pos=normPos(m[2]); return {name,pos}; }
-    const parts = s.split(/\s+/);
-    if (parts.length>1){ const last=parts[parts.length-1]; const np=normPos(last); if (np){ pos=np; name=cleanInline(parts.slice(0,-1).join(" ")); return {name,pos}; } }
-    return {name:s,pos:""};
-  }
-  function parsePairs(text){
-    const lines = normalizeNewlines(text).split(/\n+/).map(s=>s.trim()).filter(Boolean);
-    const pairs=[];
-    for (const line of lines){
-      const cleaned = line.replace(/[\u2013\u2014]/g,"-").replace(/\u00A0/g," ");
-      const parts = cleaned.split(/\s*(?:,|;|\||\bvs\b|[-–—])\s*/i).map(s=>s.trim()).filter(Boolean);
-      if (parts.length>=2){ pairs.push([parsePlayer(parts[0]), parsePlayer(parts[1])]); }
-    }
-    return pairs;
-  }
+// --- Helpers ---
+const st=(m,c='')=>{const el=document.getElementById('status');el.textContent=m;el.style.color=c==='err'?'#ef4444':(c==='ok'?'#22c55e':'');};
+function cleanInline(s){return(s||"").replace(/\uFEFF/g,"").replace(/[\u2000-\u200D]/g,"").replace(/\u00A0|\u202F/g," ").replace(/[\u2013\u2014]/g,"-").replace(/\s+/g," ").trim();}
+function normalizeNewlines(t){return(t||"").replace(/\r\n/g,"\n").replace(/\r/g,"\n").replace(/\uFEFF/g,"");}
+function normPos(p){p=cleanInline(p).toUpperCase().replace(/[^A-Z]/g,"");if(p.startsWith("GK"))return"GK";if(p.startsWith("DF"))return"DF";if(p.startsWith("MF"))return"MF";if(p.startsWith("FW"))return"FW";return"";}
+function parsePlayer(raw){let s=cleanInline(raw),name=s,pos="";let m=s.match(/^(.+?)\s*\(([^)]+)\)\s*$/);if(m){name=cleanInline(m[1]);pos=normPos(m[2]);return{name,pos};}m=s.match(/^(.+?)\s*[\/\-|;–—]\s*([A-Za-z]{1,3})\s*$/);if(m){name=cleanInline(m[1]);pos=normPos(m[2]);return{name,pos};}const parts=s.split(/\s+/);if(parts.length>1){const last=parts[parts.length-1];const np=normPos(last);if(np){pos=np;name=cleanInline(parts.slice(0,-1).join(" "));return{name,pos};}}return{name:s,pos:""};}
+function splitPairLine(line){return line.split(/\s*(?:,|;|\||\bvs\b|[-–—])\s*/i).map(s=>s.trim()).filter(Boolean);}
+function parsePairs(text){const lines=normalizeNewlines(text).split(/\n+/).map(s=>s.trim()).filter(Boolean);const pairs=[];for(const raw of lines){const parts=splitPairLine(cleanInline(raw));if(parts.length>=2)pairs.push([parsePlayer(parts[0]),parsePlayer(parts[1])]);}return pairs;}
 
-  // ====== UI elements ======
-  const pairsEl=document.getElementById('pairs');
-  const t1El=document.getElementById('team1');
-  const t2El=document.getElementById('team2');
-  const bench1El=document.getElementById('bench1');
-  const bench2El=document.getElementById('bench2');
-  const roles1El=document.getElementById('roles1');
-  const roles2El=document.getElementById('roles2');
-  const shuffleBtn=document.getElementById('shuffleBtn');
-  const reshuffleBtn=document.getElementById('reshuffleBtn');
-  const renderBtn=document.getElementById('renderBtn');
-  const countBadge=document.getElementById('countBadge');
-  const t1nameEl=document.getElementById('t1name');
-  const t2nameEl=document.getElementById('t2name');
-  const t1formEl=document.getElementById('t1formation');
-  const t2formEl=document.getElementById('t2formation');
+// --- State ---
+let latest={t1:[],t2:[]};
+const pairsEl=document.getElementById('pairs'),t1El=document.getElementById('team1'),t2El=document.getElementById('team2');
+const roles1El=document.getElementById('roles1'),roles2El=document.getElementById('roles2'),bench1El=document.getElementById('bench1'),bench2El=document.getElementById('bench2');
+const shuffleBtn=document.getElementById('shuffleBtn'),reshuffleBtn=document.getElementById('reshuffleBtn');
+const t1formEl=document.getElementById('t1formation'),t2formEl=document.getElementById('t2formation');
+const color1=document.getElementById('color1'),color2=document.getElementById('color2');
+const sizeRange=document.getElementById('sizeRange'),labelMode=document.getElementById('labelMode'),outlineModeEl=document.getElementById('outlineMode');
+const countBadge=document.getElementById('countBadge');const cv=document.getElementById('cvBoth'),dlPNG=document.getElementById('dlPNG');
 
-  const cv1=document.getElementById('cv1');
-  const cv2=document.getElementById('cv2');
-  const dlT1PNG=document.getElementById('dlT1PNG');
-  const dlT2PNG=document.getElementById('dlT2PNG');
-  const dlT1LINEUP=document.getElementById('dlT1LINEUP');
-  const dlT2LINEUP=document.getElementById('dlT2LINEUP');
+function randomizePairs(pairs){const t1=[],t2=[];for(const[a,b]of pairs){if(Math.random()<0.5){t1.push(a);t2.push(b);}else{t1.push(b);t2.push(a);}}return{t1,t2};}
+function countRoles(list){const c={GK:0,DF:0,MF:0,FW:0,UNKNOWN:0};for(const p of list){if(p.pos==="GK")c.GK++;else if(p.pos==="DF")c.DF++;else if(p.pos==="MF")c.MF++;else if(p.pos==="FW")c.FW++;else c.UNKNOWN++;}return c;}
+function badges(list){const c=countRoles(list);return`<span class="badge">GK:${c.GK}</span><span class="badge">DF:${c.DF}</span><span class="badge">MF:${c.MF}</span><span class="badge">FW:${c.FW}</span>`;}
+function renderLists(stt){const{t1,t2}=stt;t1El.innerHTML=t1.map((p,i)=>`${i+1}. ${p.name} (${p.pos||"?"})`).join("<br>");t2El.innerHTML=t2.map((p,i)=>`${i+1}. ${p.name} (${p.pos||"?"})`).join("<br>");roles1El.innerHTML=badges(t1);roles2El.innerHTML=badges(t2);bench1El.textContent="";bench2El.textContent="";countBadge.textContent=`${Math.max(t1.length,t2.length)} cặp`;}
+function doShuffle(){const pairs=parsePairs(pairsEl.value);if(!pairs.length){alert("Hãy nhập ít nhất 1 cặp.");return;}latest=randomizePairs(pairs);renderLists(latest);st("Đã bốc thăm","ok");}
+shuffleBtn.onclick=doShuffle;reshuffleBtn.onclick=doShuffle;
 
-  function randomizePairs(pairs){ const t1=[],t2=[]; for (const [a,b] of pairs){ if(Math.random()<0.5){t1.push(a);t2.push(b);} else {t1.push(b);t2.push(a);} } return {t1,t2}; }
-  function countRoles(list){ const c={GK:0,DF:0,MF:0,FW:0,UNKNOWN:0}; for (const p of list){ if(p.pos==="GK")c.GK++; else if(p.pos==="DF")c.DF++; else if(p.pos==="MF")c.MF++; else if(p.pos==="FW")c.FW++; else c.UNKNOWN++; } return c; }
-  function badges(list){ const c=countRoles(list); return `<span class="badge">GK: ${c.GK}</span><span class="badge">DF: ${c.DF}</span><span class="badge">MF: ${c.MF}</span><span class="badge">FW: ${c.FW}</span>`; }
-  function escapeHtml(s){ return (s||"").replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+// --- Formation ---
+function parseFormationStr(f){const parts=f.split('-').map(n=>parseInt(n.trim(),10)).filter(n=>!Number.isNaN(n));const arr=parts.slice(-3);while(arr.length<3)arr.unshift(0);return{def:arr[0],mid:arr[1],att:arr[2]};}
+function allocateLineup(players,f){const need={GK:1,DF:f.def,MF:f.mid,FW:f.att};const total=1+f.def+f.mid+f.att;const b={GK:[],DF:[],MF:[],FW:[],UNKNOWN:[]};for(const p of players){if(p.pos==="GK")b.GK.push(p);else if(p.pos==="DF")b.DF.push(p);else if(p.pos==="MF")b.MF.push(p);else if(p.pos==="FW")b.FW.push(p);else b.UNKNOWN.push(p);}const take=(arr,n)=>{const o=[];while(n>0&&arr.length){o.push(arr.shift());n--;}return o;};const order={GK:["DF","MF","FW","UNKNOWN"],DF:["MF","FW","UNKNOWN"],MF:["DF","FW","UNKNOWN"],FW:["MF","DF","UNKNOWN"]};const lineup=[];lineup.push(...take(b.GK,1));if(lineup.filter(p=>p.pos==="GK").length<1){for(const src of order.GK){const t=take(b[src],1);if(t.length){lineup.push(...t);break;}}}const add=(role,want)=>{const have=lineup.filter(p=>p.pos===role).length;lineup.push(...take(b[role],Math.max(0,want-have)));let n=want-lineup.filter(p=>p.pos===role).length;for(const src of order[role]){if(n<=0)break;const t=take(b[src],n);lineup.push(...t);n-=t.length;}};add("DF",need.DF);add("MF",need.MF);add("FW",need.FW);const on=lineup.slice(0,Math.min(total,players.length));const bench=[].concat(lineup.slice(on.length),b.GK,b.DF,b.MF,b.FW,b.UNKNOWN);return{onField:on,bench};}
 
-  let latest={t1:[],t2:[]};
-  function renderLists(state){
-    const {t1,t2}=state;
-    t1El.innerHTML = t1.map((p,i)=>`<div>${i+1}. ${escapeHtml(p.name)} <span class="small" style="opacity:.7">(${p.pos||"?"})</span></div>`).join("");
-    t2El.innerHTML = t2.map((p,i)=>`<div>${i+1}. ${escapeHtml(p.name)} <span class="small" style="opacity:.7">(${p.pos||"?"})</span></div>`).join("");
-    roles1El.innerHTML = badges(t1); roles2El.innerHTML = badges(t2);
-    bench1El.textContent=""; bench2El.textContent="";
-    countBadge.textContent = `${Math.max(t1.length,t2.length)} cặp`;
-  }
+// --- Pitch ---
+function drawPitch(ctx,W,H){ctx.clearRect(0,0,W,H);const marginX=260,marginY=100;ctx.fillStyle="#075e54";ctx.fillRect(marginX,marginY,W-2*marginX,H-2*marginY);const PW=W-2*marginX,PH=H-2*marginY,px=marginX,py=marginY;for(let i=0;i<10;i++){ctx.fillStyle=i%2?"rgba(255,255,255,.03)":"rgba(0,0,0,.03)";ctx.fillRect(px+i*(PW/10),py,PW/10,PH);}ctx.strokeStyle="#e5fff3";ctx.lineWidth=3;ctx.strokeRect(px,py,PW,PH);ctx.beginPath();ctx.moveTo(px+PW/2,py);ctx.lineTo(px+PW/2,py+PH);ctx.stroke();ctx.beginPath();ctx.arc(px+PW/2,py+PH/2,60,0,Math.PI*2);ctx.stroke();const boxW=PW*0.12,boxH=PH*0.53;ctx.strokeRect(px,py+(PH-boxH)/2,boxW,boxH);ctx.strokeRect(px+PW-boxW,py+(PH-boxH)/2,boxW,boxH);return{px,py,PW,PH,margin:marginX};}
+function yPositionsForColumn(n,py,PH){if(n<=0)return[];const mid=py+PH/2;if(n===1)return[mid];if(n===2){const d=PH*0.12;return[mid-d,mid+d];}const pad=py+PH*0.15,span=PH*0.70,step=span/(n-1);return Array.from({length:n},(_,i)=>pad+i*step);}
+function layoutHalf(f,side,g){const{px,py,PW,PH}=g,halfW=PW/2;const xGK=(side==='left')?(px+20):(px+PW-20);let cols;if(side==='left'){cols=[px+halfW*0.30,px+halfW*0.55,px+halfW*0.80];}else{cols=[px+PW-halfW*0.30,px+PW-halfW*0.55,px+PW-halfW*0.80];}const pos=[[xGK,py+PH/2,'GK']];yPositionsForColumn(f.def,py,PH).forEach(y=>pos.push([cols[0],y,'DF']));yPositionsForColumn(f.mid,py,PH).forEach(y=>pos.push([cols[1],y,'MF']));yPositionsForColumn(f.att,py,PH).forEach(y=>pos.push([cols[2],y,'FW']));return pos;}
 
-  function doShuffle(){
-    showErr("");
-    try{
-      const pairs=parsePairs(pairsEl.value);
-      if(!pairs.length){ alert("Hãy nhập ít nhất 1 cặp (mỗi dòng 1 cặp)."); return; }
-      latest=randomizePairs(pairs);
-      renderLists(latest);
-    }catch(e){
-      console.error(e); showErr("Có lỗi khi phân tích danh sách. Bạn thử xóa dòng gây lỗi hoặc gửi lại mẫu để mình sửa.");
-    }
-  }
-  shuffleBtn.addEventListener('click', doShuffle);
-  reshuffleBtn.addEventListener('click', doShuffle);
+// --- Text ---
+function getTextStyle(mode){if(mode==="white")return{fill:"#0b1220",stroke:"#ffffff"};if(mode==="black")return{fill:"#f8fafc",stroke:"#000000"};return{fill:"#f8fafc",stroke:null};}
+function drawOutlinedText(ctx,text,x,y,fill,stroke,line,font,align){ctx.font=font;ctx.textAlign=align;if(stroke){ctx.lineWidth=line;ctx.strokeStyle=stroke;ctx.strokeText(text,x,y);}ctx.fillStyle=fill;ctx.fillText(text,x,y);}
+function drawOutlinedWrap(ctx,text,x,startY,maxWidth,lineHeight,fill,stroke,line,font,align){ctx.font=font;ctx.textAlign=align;if(stroke)ctx.strokeStyle=stroke;ctx.fillStyle=fill;let words=(text||"").split(" ");let lineTxt="",y=startY;for(let i=0;i<words.length;i++){const test=lineTxt?lineTxt+" "+words[i]:words[i];if(ctx.measureText(test).width>maxWidth&&i>0){if(stroke){ctx.lineWidth=line;ctx.strokeText(lineTxt,x,y);}ctx.fillText(lineTxt,x,y);lineTxt=words[i];y+=lineHeight;}else lineTxt=test;}if(lineTxt){if(stroke){ctx.lineWidth=line;ctx.strokeText(lineTxt,x,y);}ctx.fillText(lineTxt,x,y);}}
 
-  // ====== Formation + canvas (GK on goal line) ======
-  function parseFormationStr(f){ const parts=f.split('-').map(n=>parseInt(n.trim(),10)).filter(n=>!Number.isNaN(n)); const arr=parts.slice(-3); while(arr.length<3) arr.unshift(0); return {def:arr[0],mid:arr[1],att:arr[2]}; }
-  function allocateLineup(players, formation){
-    const want={GK:1, DF:formation.def, MF:formation.mid, FW:formation.att};
-    const byRole={GK:[],DF:[],MF:[],FW:[],UNKNOWN:[]};
-    for (const p of players){ (byRole[p.pos]?byRole[p.pos]:byRole.UNKNOWN).push(p); }
-    const lineup=[];
-    function take(role,n){const out=[]; while(n>0 && byRole[role].length){ out.push(byRole[role].shift()); n--; } return out; }
-    lineup.push(...take("GK",1), ...take("DF",want.DF), ...take("MF",want.MF), ...take("FW",want.FW));
-    function fill(role,n){ const prefs=role==="DF"?["MF","FW","UNKNOWN"]:role==="MF"?["DF","FW","UNKNOWN"]:role==="FW"?["MF","DF","UNKNOWN"]:["DF","MF","FW","UNKNOWN"]; for(const pr of prefs){ while(n>0 && byRole[pr].length){ lineup.push(byRole[pr].shift()); n--; } } }
-    const have={GK:lineup.filter(p=>p.pos==="GK").length, DF:lineup.filter(p=>p.pos==="DF").length, MF:lineup.filter(p=>p.pos==="MF").length, FW:lineup.filter(p=>p.pos==="FW").length};
-    if (have.GK<1) fill("GK",1-have.GK);
-    if (have.DF<want.DF) fill("DF",want.DF-have.DF);
-    if (have.MF<want.MF) fill("MF",want.MF-have.MF);
-    if (have.FW<want.FW) fill("FW",want.FW-have.FW);
-    const needTotal=1+formation.def+formation.mid+formation.att;
-    const onField=lineup.slice(0,needTotal);
-    const bench=[].concat(lineup.slice(needTotal), byRole.GK, byRole.DF, byRole.MF, byRole.FW, byRole.UNKNOWN);
-    return {onField, bench};
-  }
+// --- Draw ---
+function drawTeam(ctx,pos,players,color,r,labelMode,outlineMode){const ts=getTextStyle(outlineMode);for(let i=0;i<pos.length;i++){const[x,y,role]=pos[i],p=players[i];ctx.beginPath();ctx.fillStyle=color;ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.stroke();if(labelMode==='number'){drawOutlinedText(ctx,String(i+1),x,y+4,ts.fill,ts.stroke,3,"bold 14px system-ui","center");}else{const topY=(role==='GK')?(y-r-10):(y-r-6);drawOutlinedWrap(ctx,p? p.name:role,x,topY,170,15,ts.fill,ts.stroke,3,"600 13px system-ui","center");}drawOutlinedText(ctx,p?`(${p.pos||role})`:`(${role})`,x,y+r+14,ts.fill,ts.stroke,3,"11px system-ui","center");}}
+function drawBenchesDots(ctx,leftBench,rightBench,c1,c2,r,g,outlineMode){const{px,py,PW,PH,margin}=g;const gap=r*2.2;const leftX=px-margin*0.45,rightX=px+PW+margin*0.45;const totalH=Math.max(leftBench.length,rightBench.length)*gap;const startY=py+PH/2-totalH/2;const ts=getTextStyle(outlineMode);for(let i=0;i<leftBench.length;i++){const y=startY+i*gap;ctx.beginPath();ctx.fillStyle=c1;ctx.arc(leftX,y,r,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.stroke();const txt=`${leftBench[i].name}${leftBench[i].pos?` (${leftBench[i].pos})`:""}`;drawOutlinedText(ctx,txt,leftX-r-24,y+4,ts.fill,ts.stroke,3,"12px system-ui","right");}for(let i=0;i<rightBench.length;i++){const y=startY+i*gap;ctx.beginPath();ctx.fillStyle=c2;ctx.arc(rightX,y,r,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.stroke();const txt=`${rightBench[i].name}${rightBench[i].pos?` (${rightBench[i].pos})`:""}`;drawOutlinedText(ctx,txt,rightX+r+24,y+4,ts.fill,ts.stroke,3,"12px system-ui","left");}}
 
-  function drawPitch7(ctx,W,H){
-    ctx.fillStyle="#065f46"; ctx.fillRect(0,0,W,H);
-    for (let i=0;i<8;i++){ ctx.fillStyle = i%2? "rgba(255,255,255,0.025)" : "rgba(0,0,0,0.02)"; ctx.fillRect(i*(W/8),0,W/8,H); }
-    ctx.strokeStyle="#d1fae5"; ctx.lineWidth=2;
-    ctx.strokeRect(10,10,W-20,H-20);
-    ctx.beginPath(); ctx.moveTo(W/2,10); ctx.lineTo(W/2,H-10); ctx.stroke();
-    ctx.beginPath(); ctx.arc(W/2,H/2,50,0,Math.PI*2); ctx.stroke();
-    const boxW=90, boxH=220;
-    ctx.strokeRect(10,(H-boxH)/2,boxW,boxH);
-    ctx.strokeRect(W-10-boxW,(H-boxH)/2,boxW,boxH);
-  }
-  function layoutPositions7(formation, side='left'){
-    const rowsX=[0.10,0.30,0.55,0.82];
-    let xD=rowsX[1], xM=rowsX[2], xA=rowsX[3];
-    if (side==='right'){ xD=1-xD; xM=1-xM; xA=1-xA; }
-    const pos=[];
-    pos.push([side==='left'?0.03:0.97, 0.5, 'GK']);
-    function spreadY(n){ if(n<=0)return[]; if(n===1)return[0.5]; const pad=0.12,span=1-pad*2,step=span/(n-1); return Array.from({length:n},(_,i)=>pad+i*step); }
-    spreadY(formation.def).forEach(y=>pos.push([xD,y,'DF']));
-    spreadY(formation.mid).forEach(y=>pos.push([xM,y,'MF']));
-    spreadY(formation.att).forEach(y=>pos.push([xA,y,'FW']));
-    return pos;
-  }
-  function drawTeamOnCanvas7(canvas, formation, teamName, assigned, side='left'){
-    const ctx=canvas.getContext('2d'); const W=canvas.width,H=canvas.height; const margin=10; const r=18; const pad=6;
-    drawPitch7(ctx,W,H);
-    const pos=layoutPositions7(formation,side);
-    const onField=assigned.onField;
-    ctx.fillStyle="#e2e8f0"; ctx.font="bold 22px system-ui,-apple-system,Segoe UI,Roboto"; ctx.textAlign="center";
-    ctx.fillText(`${teamName} — ${formation.def}-${formation.mid}-${formation.att}`, W/2, 36);
-    for(let i=0;i<pos.length;i++){
-      const [nx,ny,role]=pos[i];
-      let x = margin + nx*(W-2*margin);
-      const y = margin + ny*(H-2*margin);
-      if (role==='GK'){ x = side==='left' ? (margin + r + pad) : (W - margin - r - pad); }
-      ctx.beginPath(); ctx.fillStyle= role==='GK' ? "#1d4ed8" : "#111827"; ctx.strokeStyle="#f8fafc"; ctx.lineWidth=2; ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
-      const p=onField[i]; const label=p ? `${p.name}` : role;
-      ctx.fillStyle="#f8fafc"; ctx.font="600 13px system-ui,-apple-system,Segoe UI"; ctx.textAlign="center";
-      wrapText(ctx,label,x,y-r-6,160,14);
-      ctx.fillStyle="rgba(248,250,252,.8)"; ctx.font="11px system-ui,-apple-system"; ctx.fillText(p ? `(${p.pos||role})` : `(${role})`, x, y+r+14);
-    }
-  }
-  function wrapText(ctx,text,cx,startY,maxWidth,lineHeight){
-    if(!text) return; const words=text.split(" "); let line="", y=startY;
-    for (let n=0;n<words.length;n++){ const test=line?line+" "+words[n]:words[n]; if(ctx.measureText(test).width>maxWidth && n>0){ ctx.fillText(line,cx,y); line=words[n]; y+=lineHeight; } else { line=test; } }
-    ctx.fillText(line,cx,y);
-  }
-
-  document.getElementById('renderBtn').addEventListener('click', ()=>{
-    try{
-      if (!latest.t1.length || !latest.t2.length) doShuffle();
-      const f1=parseFormationStr(t1formEl.value); const f2=parseFormationStr(t2formEl.value);
-      const asg1=allocateLineup(latest.t1,f1); const asg2=allocateLineup(latest.t2,f2);
-      drawTeamOnCanvas7(cv1,f1,(document.getElementById('t1name').value||"Đội 1"),asg1,'left');
-      drawTeamOnCanvas7(cv2,f2,(document.getElementById('t2name').value||"Đội 2"),asg2,'right');
-      bench1El.textContent = asg1.bench.length ? ("Dự bị: " + asg1.bench.map(p=>`${p.name}${p.pos?` (${p.pos})`:""}`).join(", ")) : "";
-      bench2El.textContent = asg2.bench.length ? ("Dự bị: " + asg2.bench.map(p=>`${p.name}${p.pos?` (${p.pos})`:""}`).join(", ")) : "";
-      showErr("");
-    }catch(e){ console.error(e); showErr("Có lỗi khi vẽ sơ đồ."); }
-  });
-
-  function downloadPNG(canvas, filename){ const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download=filename; a.click(); }
-  dlT1PNG.addEventListener('click', ()=>{ const name=(document.getElementById('t1name').value||"Doi1").replace(/\s+/g,'_'); downloadPNG(cv1, `${name}_so_do_7nguoi.png`); });
-  dlT2PNG.addEventListener('click', ()=>{ const name=(document.getElementById('t2name').value||"Doi2").replace(/\s+/g,'_'); downloadPNG(cv2, `${name}_so_do_7nguoi.png`); });
-
-  function downloadLineup(players, teamName, formationStr){
-    const f=parseFormationStr(formationStr); const asg=allocateLineup(players,f);
-    const onField=asg.onField, bench=asg.bench; const lines=[];
-    lines.push(`# ${teamName} (7 người — ${f.def}-${f.mid}-${f.att})`);
-    if(onField[0]) lines.push(`GK: ${onField[0].name}`);
-    const rest=onField.slice(1).map(p=>`${p.name}${p.pos?` (${p.pos})`:""}`);
-    lines.push(`Outfield (6): ${rest.join(", ")}`);
-    if(bench.length) lines.push(`Dự bị: ${bench.map(p=>`${p.name}${p.pos?` (${p.pos})`:""}`).join(", ")}`);
-    const blob=new Blob([lines.join("\\n")],{type:"text/plain;charset=utf-8"}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${teamName.replace(/\\s+/g,'_')}_lineup.txt`; a.click(); URL.revokeObjectURL(a.href);
-  }
-  dlT1LINEUP.addEventListener('click', ()=> downloadLineup(latest.t1, (document.getElementById('t1name').value||"Doi1"), t1formEl.value));
-  dlT2LINEUP.addEventListener('click', ()=> downloadLineup(latest.t2, (document.getElementById('t2name').value||"Doi2"), t2formEl.value));
+// --- Render ---
+function renderBoth(){if(!latest.t1.length||!latest.t2.length)doShuffle();const ctx=cv.getContext('2d'),W=cv.width,H=cv.height;const f1=parseFormationStr(t1formEl.value),f2=parseFormationStr(t2formEl.value);const asg1=allocateLineup(latest.t1,f1),asg2=allocateLineup(latest.t2,f2);const r=Math.max(10,parseInt(sizeRange.value,10)||18);const c1=color1.value,c2=color2.value,label=labelMode.value,outlineMode=outlineModeEl.value;const geom=drawPitch(ctx,W,H);drawTeam(ctx,layoutHalf(f1,'left',geom),asg1.onField,c1,r,label,outlineMode);drawTeam(ctx,layoutHalf(f2,'right',geom),asg2.onField,c2,r,label,outlineMode);drawBenchesDots(ctx,asg1.bench,asg2.bench,c1,c2,Math.max(10,r-4),geom,outlineMode);bench1El.textContent=asg1.bench.length?("Dự bị: "+asg1.bench.map(p=>`${p.name}${p.pos?` (${p.pos})`:""}`).join(", ")):"";bench2El.textContent=asg2.bench.length?("Dự bị: "+asg2.bench.map(p=>`${p.name}${p.pos?` (${p.pos})`:""}`).join(", ")):"";st("Đã vẽ sơ đồ","ok");}
+document.getElementById('renderBtn').onclick=renderBoth;dlPNG.onclick=()=>{const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download='so_do.png';a.click();};
 </script>
 </body>
 </html>
